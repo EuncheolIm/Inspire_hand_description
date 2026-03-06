@@ -58,3 +58,6 @@ Also, you can "Pause/Resume" the simulator using "Space bar"
 ## Notes
 - You can check the controlled joints in `ACTUATED_JOINTS` in `control_inspire_hand.py`.
 - Control gains can be adjusted with `KP_SINGLE_HAND` and `KD_SINGLE_HAND`.
+
+## Author
+- **Euncheol Im** - euncheol.im@kist.re.kr
