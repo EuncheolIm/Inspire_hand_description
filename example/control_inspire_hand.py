@@ -69,6 +69,12 @@ def main():
     loop_steps = 600
     trajectory = generate_target_trajectory(joint_ranges, loop_steps=loop_steps)
     step = 0
+    cam_step = 0
+
+    # Camera orbit: azimuth 180 ± 30 degrees, one full cycle over cam_loop_steps
+    cam_base_azimuth = 180
+    cam_amplitude = 30
+    cam_loop_steps = 2400  # slow orbit
 
     # Debug: print trajectory range for each actuator
     print(f"\nTrajectory ranges:")
@@ -78,7 +84,14 @@ def main():
 
     print(f"\nActuators: {model.nu}, Joints: {model.njnt}")
 
-    with mujoco.viewer.launch_passive(model, data) as viewer:
+    paused = [False]
+
+    def key_callback(keycode):
+        if keycode == 32:  # Space bar to pause/resume
+            paused[0] = not paused[0]
+            print(f"{'[Paused]' if paused[0] else '[Resumed]'}")
+
+    with mujoco.viewer.launch_passive(model, data, key_callback=key_callback) as viewer:
         viewer.cam.azimuth = 180
         viewer.cam.elevation = -20
         viewer.cam.distance = 0.8
@@ -86,6 +99,11 @@ def main():
         viewer.opt.geomgroup[2] = 0
 
         while viewer.is_running():
+            if paused[0]:
+                viewer.sync()
+                time.sleep(0.01)
+                continue
+
             # Target positions for this step
             q_target = trajectory[step]
             step = (step + 1) % loop_steps
@@ -99,6 +117,10 @@ def main():
                 torque = KP[i] * pos_error -  KD[i] * vel
                 # torque = 0.1 * pos_error - 0.01 * vel
                 data.ctrl[i] = np.clip(torque, -1, 1)
+
+            # Camera orbit
+            viewer.cam.azimuth = cam_base_azimuth + cam_amplitude * np.sin(2 * np.pi * cam_step / cam_loop_steps)
+            cam_step = (cam_step + 1) % cam_loop_steps
 
             mujoco.mj_step(model, data)
             viewer.sync()

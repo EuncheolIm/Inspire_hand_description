@@ -4,6 +4,8 @@
 
 This project provides a MuJoCo simulation for the `Inspire hand RH56DFTP-2L` model.
 
+![Demo](assets/Inspire_hand.gif)
+
 ## Overview
 - Includes Inspire Hand model files (URDF/XML/OBJ) and an example control script.
 - Mesh files are organized into separate `collision/` and `visual/` folders.
@@ -50,6 +52,8 @@ python example/control_inspire_hand.py
 ```
 
 When executed, the viewer opens and finger joints move repeatedly within their configured ranges.
+
+Also, you can "Pause/Resume" the simulator using "Space bar"
 
 ## Notes
 - You can check the controlled joints in `ACTUATED_JOINTS` in `control_inspire_hand.py`.
